@@ -24,7 +24,29 @@ const eventSchema = new mongoose.Schema({
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    }
+    },
+    rsvpList: [{
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        status: {
+            type: String,
+            enum: ['GOING', 'MAYBE', 'NOT_GOING'],
+            default: 'GOING'
+        }
+    }],
+    attendance: [{
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        status: {
+            type: String,
+            enum: ['PRESENT', 'ABSENT', 'LATE'],
+            default: 'PRESENT'
+        }
+    }]
 }, {
     timestamps: true
 });

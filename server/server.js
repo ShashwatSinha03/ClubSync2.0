@@ -22,8 +22,8 @@ connectDB();
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/events', require('./routes/eventRoutes'));
-// app.use('/api/users', require('./routes/userRoutes')); // Will add later
-// app.use('/api/announcements', require('./routes/announcementRoutes')); // Will add later
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/announcements', require('./routes/announcementRoutes'));
 
 const PORT = process.env.PORT || 5000;
 

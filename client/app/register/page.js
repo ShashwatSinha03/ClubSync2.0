@@ -5,12 +5,15 @@ import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-export default function LoginPage() {
-    const { login } = useAuth();
+export default function RegisterPage() {
+    const { register } = useAuth();
     const router = useRouter();
     const [formData, setFormData] = useState({
+        name: '',
         email: '',
-        password: ''
+        password: '',
+        phone: '',
+        instrument: 'Vocalist'
     });
     const [error, setError] = useState('');
 
@@ -21,7 +24,7 @@ export default function LoginPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-        const res = await login(formData.email, formData.password);
+        const res = await register(formData);
         if (!res.success) {
             setError(res.error);
         }
@@ -34,8 +37,8 @@ export default function LoginPage() {
             <div className="login-card">
                 <div className="card-header">
                     <Link href="/" className="logo">SAARANG</Link>
-                    <h1>Welcome Back</h1>
-                    <p>Sign in to sync your rhythm.</p>
+                    <h1>Join the Club</h1>
+                    <p>Start your musical journey today.</p>
                 </div>
 
                 <div className="card-body">
@@ -50,6 +53,18 @@ export default function LoginPage() {
                     }}>{error}</div>}
                     
                     <form onSubmit={handleSubmit} className="auth-form">
+                        <div className="form-group">
+                            <label>Full Name</label>
+                            <input
+                                type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                required
+                                placeholder="Enter your full name"
+                                className="form-input"
+                            />
+                        </div>
                         <div className="form-group">
                             <label>Email Address</label>
                             <input
@@ -70,29 +85,56 @@ export default function LoginPage() {
                                 value={formData.password}
                                 onChange={handleChange}
                                 required
-                                placeholder="Enter your password"
+                                placeholder="Create a password"
                                 className="form-input"
                             />
                         </div>
-                        <button type="submit" className="cta-button full-width">Sign In</button>
+                        <div className="form-group">
+                            <label>Phone Number</label>
+                            <input
+                                type="tel"
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleChange}
+                                placeholder="Your contact number"
+                                className="form-input"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>Primary Instrument</label>
+                            <select
+                                name="instrument"
+                                value={formData.instrument}
+                                onChange={handleChange}
+                                className="form-input"
+                            >
+                                <option value="Vocalist">Vocalist</option>
+                                <option value="Guitarist">Guitarist</option>
+                                <option value="Drummer">Drummer</option>
+                                <option value="Keyboardist">Keyboardist</option>
+                                <option value="Bassist">Bassist</option>
+                                <option value="Tablist">Tablist</option>
+                                <option value="Violinist">Violinist</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" className="cta-button full-width">Sign Up</button>
                     </form>
 
                     <div className="auth-footer" style={{marginTop: '1.5rem', textAlign: 'center', color: 'rgba(255,255,255,0.6)'}}>
-                        <p>Don't have an account? <Link href="/register" style={{color: '#ffdd00', textDecoration: 'none'}}>Sign Up</Link></p>
+                        <p>Already have an account? <Link href="/login" style={{color: '#ffdd00', textDecoration: 'none'}}>Sign In</Link></p>
                     </div>
-                </div>
-
-                <div className="card-footer">
-                    <p>By continuing, you agree to our Terms of Service and Privacy Policy.</p>
                 </div>
             </div>
             <style jsx>{`
                 .form-group {
-                    margin-bottom: 1.5rem;
+                    margin-bottom: 1.2rem;
+                    text-align: left;
                 }
                 .form-group label {
                     display: block;
-                    margin-bottom: 0.5rem;
+                    margin-bottom: 0.4rem;
                     color: rgba(255, 255, 255, 0.8);
                     font-size: 0.9rem;
                 }
@@ -110,6 +152,10 @@ export default function LoginPage() {
                     outline: none;
                     border-color: #ffdd00;
                     background: rgba(255, 255, 255, 0.1);
+                }
+                .form-input option {
+                    background: #121212;
+                    color: white;
                 }
                 .full-width {
                     width: 100%;

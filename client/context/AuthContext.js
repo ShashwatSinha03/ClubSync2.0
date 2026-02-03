@@ -33,12 +33,12 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const loginWithGoogle = async (token) => {
+    const login = async (email, password) => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token }),
+                body: JSON.stringify({ email, password }),
                 credentials: 'include'
             });
 
@@ -48,7 +48,31 @@ export const AuthProvider = ({ children }) => {
                 router.push('/dashboard');
                 return { success: true };
             } else {
-                return { success: false, error: 'Login failed' };
+                const errorData = await res.json();
+                return { success: false, error: errorData.message || 'Login failed' };
+            }
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    };
+
+    const register = async (userData) => {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData),
+                credentials: 'include'
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setUser(data);
+                router.push('/dashboard');
+                return { success: true };
+            } else {
+                const errorData = await res.json();
+                return { success: false, error: errorData.message || 'Registration failed' };
             }
         } catch (error) {
             return { success: false, error: error.message };
@@ -69,7 +93,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, loginWithGoogle, logout }}>
+        <AuthContext.Provider value={{ user, loading, login, register, logout }}>
             {children}
         </AuthContext.Provider>
     );
