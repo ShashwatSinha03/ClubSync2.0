@@ -2,19 +2,14 @@
 
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
-import { useGoogleLogin } from '@react-oauth/google';
+
 import { useState } from 'react';
 
 export default function Navbar() {
-    const { user, loginWithGoogle, logout } = useAuth();
+    const { user, logout } = useAuth();
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
-    const googleLogin = useGoogleLogin({
-        onSuccess: async (tokenResponse) => {
-            // Google gives us an access token or code. 
-        },
-        onError: () => console.log('Login Failed')
-    });
+
 
     return (
         <nav className="navbar">
