@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const AttendanceSchema = new mongoose.Schema({
+const RSVPSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -11,16 +11,16 @@ const AttendanceSchema = new mongoose.Schema({
     ref: 'Event',
     required: true
   },
-  present: {
-    type: Boolean,
+  status: {
+    type: String,
     required: true,
-    default: false
+    enum: ['GOING', 'NOT_GOING']
   }
 }, {
   timestamps: true
 });
 
-// Ensure one attendance record per user per event
-AttendanceSchema.index({ userId: 1, eventId: 1 }, { unique: true });
+// Ensure a user can only have one RSVP per event
+RSVPSchema.index({ userId: 1, eventId: 1 }, { unique: true });
 
-module.exports = mongoose.model('Attendance', AttendanceSchema);
+module.exports = mongoose.model('RSVP', RSVPSchema);

@@ -1,28 +1,46 @@
 :root {
-  /* Premium Dark Theme Variables */
-  --background: #0a0a0a;
-  --surface: #121212;
-  --surface-hover: #1e1e1e;
-  --primary: #8b5cf6; /* Electric Purple */
-  --primary-hover: #7c3aed;
-  --secondary: #ec4899; /* Pink/Magenta */
-  --text-main: #ffffff;
-  --text-muted: #a3a3a3;
-  --border: #27272a;
-  --error: #ef4444;
-  --success: #22c55e;
+  /* Phase E2: The Pulse - Editorial Design Tokens */
+  --background: #292929;
+  --surface: #333333;
+  --surface-hover: #3d3d3d;
+  --primary: #FFFFFF; 
+  --accent: #FFFFFF;
+  --text-main: #FFFFFF;
+  --text-muted: #BDBDBD;
+  --border: rgba(255, 255, 255, 0.1);
+  --error: #FF5252;
+  --success: #66BB6A;
   
-  --font-main: var(--font-outfit), system-ui, sans-serif;
+  --radius: 8px;
+  --max-width: 900px; /* Editorial center width */
   
-  --radius: 12px;
-  --header-height: 70px;
-  
-  /* Spacing */
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 2rem;
-  --spacing-xl: 4rem;
+  /* Spacing - Editorial Feel */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 2rem;
+  --spacing-lg: 4rem;
+  --spacing-xl: 6rem;
+  /* Nav Colors */
+  --nav-base: #292929;
+  --nav-pill: #EEE5E9;
 }
+
+[data-theme='light'] {
+  --background: #EEE5E9;
+  --surface: #FFFFFF;
+  --surface-hover: #F5F5F7;
+  --primary: #292929;
+  --accent: #292929;
+  --text-main: #292929;
+  --text-muted: #666666;
+  --border: rgba(0, 0, 0, 0.1);
+  
+  /* Nav Colors Reverse */
+  --nav-base: #EEE5E9;
+  --nav-pill: #292929;
+}
+
+
 
 * {
   box-sizing: border-box;
@@ -33,9 +51,17 @@
 body {
   background-color: var(--background);
   color: var(--text-main);
-  font-family: var(--font-main);
+  /* Fix: Apply the variable directly here, since it lives on body class */
+  font-family: var(--font-nunito), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, .font-header {
+  font-family: var(--font-spinnaker), system-ui, sans-serif;
+  font-weight: 400; /* Spinnaker looks best at regular weight */
+  letter-spacing: 0.5px;
 }
 
 a {
@@ -46,7 +72,12 @@ a {
 button {
   cursor: pointer;
   border: none;
-  font-family: inherit;
+  font-family: var(--font-spinnaker), system-ui, sans-serif; /* Use Spinnaker for actions */
+  letter-spacing: 0.5px;
+}
+
+label, .label, .section-label, .nav-link, .tab-btn {
+  font-family: var(--font-spinnaker), system-ui, sans-serif;
 }
 
 /* Utilities */
@@ -200,6 +231,60 @@ button {
     color: var(--text-muted);
     opacity: 0.6;
     line-height: 1.5;
+}
+
+/* Auth Form Styles */
+.auth-form .form-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.auth-form .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
+.auth-form .form-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.auth-form .form-input:focus {
+    outline: none;
+    border-color: #ffdd00;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.auth-form .form-input option {
+    background: #121212;
+    color: white;
+}
+
+.auth-form .full-width {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 14px;
+    background: var(--primary, #8b5cf6);
+    color: white;
+    border: none;
+    border-radius: 99px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.auth-form .full-width:hover {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+    transform: translateY(-2px);
 }
 
 /* Landing Page Global Styles */

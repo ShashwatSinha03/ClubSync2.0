@@ -21,6 +21,12 @@ export default function LoginPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+
+        if (!formData.email.endsWith('@rishihood.edu.in')) {
+            setError('Please use your official Rishihood University email address.');
+            return;
+        }
+
         const res = await login(formData.email, formData.password);
         if (!res.success) {
             setError(res.error);
@@ -74,11 +80,11 @@ export default function LoginPage() {
                                 className="form-input"
                             />
                         </div>
-                        <button type="submit" className="cta-button full-width">Sign In</button>
+                        <button type="submit" className="cta-button full-width">Log In</button>
                     </form>
 
                     <div className="auth-footer" style={{marginTop: '1.5rem', textAlign: 'center', color: 'rgba(255,255,255,0.6)'}}>
-                        <p>Don't have an account? <Link href="/register" style={{color: '#ffdd00', textDecoration: 'none'}}>Sign Up</Link></p>
+                        <p>Don't have an account? <Link href="/signup" style={{color: '#ffdd00', textDecoration: 'none'}}>Sign Up</Link></p>
                     </div>
                 </div>
 
@@ -86,49 +92,7 @@ export default function LoginPage() {
                     <p>By continuing, you agree to our Terms of Service and Privacy Policy.</p>
                 </div>
             </div>
-            <style jsx>{`
-                .form-group {
-                    margin-bottom: 1.5rem;
-                }
-                .form-group label {
-                    display: block;
-                    margin-bottom: 0.5rem;
-                    color: rgba(255, 255, 255, 0.8);
-                    font-size: 0.9rem;
-                }
-                .form-input {
-                    width: 100%;
-                    padding: 12px 16px;
-                    background: rgba(255, 255, 255, 0.05);
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                    border-radius: 8px;
-                    color: white;
-                    font-size: 1rem;
-                    transition: all 0.3s ease;
-                }
-                .form-input:focus {
-                    outline: none;
-                    border-color: #ffdd00;
-                    background: rgba(255, 255, 255, 0.1);
-                }
-                .full-width {
-                    width: 100%;
-                    margin-top: 1rem;
-                    padding: 14px;
-                    background: var(--primary, #8b5cf6);
-                    color: white;
-                    border: none;
-                    border-radius: 99px;
-                    font-size: 1.1rem;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                }
-                .full-width:hover {
-                    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
-                    transform: translateY(-2px);
-                }
-            `}</style>
+
         </div>
     );
 }

@@ -11,7 +11,7 @@ export default function Home() {
 
   useEffect(() => {
     if (user) {
-      router.push('/dashboard');
+      router.push('/home');
     }
   }, [user, router]);
 
@@ -33,7 +33,7 @@ export default function Home() {
             
             <div className="hero__actions">
             {!user && (
-                <Link href="/login" className="btn btn--primary btn--large">
+                <Link href="/signup" className="btn btn--primary btn--large">
                     Get Started
                 </Link>
             )}

@@ -19,6 +19,11 @@ const userSchema = new mongoose.Schema({
         enum: ['MEMBER', 'ADMIN'],
         default: 'MEMBER'
     },
+    accountStatus: {
+        type: String,
+        enum: ['PENDING', 'APPROVED'],
+        default: 'PENDING'
+    },
     profilePicture: {
         type: String
     },
@@ -33,9 +38,9 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 });
 
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
     if (!this.isModified('password')) {
-        next();
+        return;
     }
 
     const bcrypt = require('bcryptjs');

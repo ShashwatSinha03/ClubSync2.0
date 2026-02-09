@@ -45,10 +45,15 @@ export const AuthProvider = ({ children }) => {
             if (res.ok) {
                 const data = await res.json();
                 setUser(data);
-                router.push('/dashboard');
+                router.push('/home');
                 return { success: true };
             } else {
                 const errorData = await res.json();
+                // Check if user is pending approval
+                if (errorData.status === 'PENDING') {
+                    router.push('/pending');
+                    return { success: false, error: errorData.message, status: 'PENDING' };
+                }
                 return { success: false, error: errorData.message || 'Login failed' };
             }
         } catch (error) {
@@ -67,9 +72,9 @@ export const AuthProvider = ({ children }) => {
 
             if (res.ok) {
                 const data = await res.json();
-                setUser(data);
-                router.push('/dashboard');
-                return { success: true };
+                // User is pending approval - don't set user state
+                router.push('/pending');
+                return { success: true, status: 'PENDING' };
             } else {
                 const errorData = await res.json();
                 return { success: false, error: errorData.message || 'Registration failed' };

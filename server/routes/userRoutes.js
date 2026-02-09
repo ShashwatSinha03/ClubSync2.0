@@ -1,73 +1,91 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
 const Event = require('../models/Event');
-const { protect, admin } = require('../middleware/auth');
+const RSVP = require('../models/RSVP');
+const Attendance = require('../models/Attendance');
+const { protect } = require('../middleware/auth');
 
-// @route   GET /api/users
-// @desc    Get all users (Admin only)
-// @access  Private (Admin)
-router.get('/', protect, admin, async (req, res) => {
-    try {
-        const users = await User.find({}).sort({ name: 1 });
-        res.json(users);
-    } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
-    }
-});
-
-// @route   PUT /api/users/profile
-// @desc    Update user profile (Self)
+// @route   GET /api/users/activity
+// @desc    Get current user's activity stats (Attended, Missed, Upcoming)
 // @access  Private
-router.put('/profile', protect, async (req, res) => {
+router.get('/activity', protect, async (req, res) => {
     try {
-        const user = await User.findById(req.user._id);
-        if (user) {
-            user.instrument = req.body.instrument || user.instrument;
-            user.phone = req.body.phone || user.phone;
-            const updated = await user.save();
-            res.json(updated);
-        } else {
-            res.status(404).json({ message: 'User not found' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
-    }
-});
+        const userId = req.user._id;
+        const now = new Date();
 
-// @route   GET /api/users/stats/:id
-// @desc    Get member attendance stats
-// @access  Private
-router.get('/stats/:id', protect, async (req, res) => {
-    try {
-        const userId = req.params.id;
-        // Total events that have passed
-        const totalPastEvents = await Event.countDocuments({ date: { $lt: new Date() } });
+        // Fetch all events
+        const events = await Event.find().sort({ dateTime: 1 });
+
+        // Fetch user's RSVPs and Attendance
+        const rsvps = await RSVP.find({ userId });
+        const attendanceRecords = await Attendance.find({ userId });
+
+        const history = events.map(event => {
+            const eventDate = new Date(event.dateTime);
+            const rsvp = rsvps.find(r => r.eventId.toString() === event._id.toString());
+            const attendance = attendanceRecords.find(a => a.eventId.toString() === event._id.toString());
+
+            let status = 'NONE'; // Default
+
+            if (attendance && attendance.present) {
+                status = 'ATTENDED';
+            } else if (eventDate < now) {
+                if (rsvp && rsvp.status === 'GOING' && (!attendance || !attendance.present)) {
+                    status = 'MISSED';
+                } else {
+                    status = 'PAST'; // Just an older event they didn't interact with
+                }
+            } else {
+                if (rsvp && rsvp.status === 'GOING') {
+                    status = 'UPCOMING';
+                }
+            }
+
+            return {
+                _id: event._id,
+                title: event.title,
+                type: event.type,
+                dateTime: event.dateTime,
+                status
+            };
+        });
+
+        // Calculate summary
+        // "Attended X of Y events" (Count past events where type != 'Audition' maybe? Or just all?)
+        // Let's count all past events as denominator for simple participation rate?
+        // Actually, user requested: "Attended 7 out of the last 10 sessions"
+        // Let's just return raw numbers and let frontend format the text?
+        // Or return the specific text as requested by "calm summary".
+
+        const attendedCount = history.filter(h => h.status === 'ATTENDED').length;
+        const missedCount = history.filter(h => h.status === 'MISSED').length;
+        const pastEventsCount = events.filter(e => new Date(e.dateTime) < now).length;
         
-        // Events where user was present
-        const attendedEvents = await Event.countDocuments({
-            date: { $lt: new Date() },
-            'attendance.user': userId,
-            'attendance.status': 'PRESENT'
-        });
+        // Filter history to only relevant items for the user (remove 'PAST' where they had no interaction?)
+        // "Events attended", "Events RSVPd but missed", "Upcoming events committed to"
+        // So we filter out 'PAST' and 'NONE' for the list, but keep numbers for stats.
+        
+        const relevantHistory = history.filter(h => ['ATTENDED', 'MISSED', 'UPCOMING'].includes(h.status));
 
-        const rsvps = await Event.find({
-            'rsvpList.user': userId
-        }, 'title date rsvpList');
-
+        // Sort history: Upcoming first (asc), then Past (desc)
+        // Actually, "Ordered by time" rule. 
+        // Maybe separate lists? Or just one list.
+        // Let's return one list sorted descending? Or Split.
+        // Frontend "The People" spec: "Ordered by time".
+        
         res.json({
-            attendedEvents,
-            totalPastEvents,
-            attendancePercentage: totalPastEvents > 0 ? (attendedEvents / totalPastEvents) * 100 : 0,
-            rsvpHistory: rsvps.map(e => ({
-                eventId: e._id,
-                title: e.title,
-                date: e.date,
-                status: e.rsvpList.find(r => r.user.toString() === userId.toString()).status
-            }))
+            memberSince: req.user.createdAt,
+            stats: {
+                attended: attendedCount,
+                totalPast: pastEventsCount,
+                missed: missedCount
+            },
+            history: relevantHistory.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime))
         });
+
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 

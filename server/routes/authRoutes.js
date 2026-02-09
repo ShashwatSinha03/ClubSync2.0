@@ -21,6 +21,11 @@ router.post('/register', async (req, res) => {
         return res.status(400).json({ message: 'Please add all fields' });
     }
 
+    // Enforce Rishihood Email
+    if (!email.endsWith('@rishihood.edu.in')) {
+        return res.status(400).json({ message: 'Please use your official Rishihood University email address.' });
+    }
+
     try {
         const userExists = await User.findOne({ email });
 
@@ -38,22 +43,11 @@ router.post('/register', async (req, res) => {
         });
 
         if (user) {
-            const token = generateToken(user._id);
-            res.cookie('token', token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
-            });
-
+            // Don't auto-login - user needs admin approval first
             res.status(201).json({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                profilePicture: user.profilePicture,
-                instrument: user.instrument,
-                phone: user.phone
+                message: 'Registration successful. Waiting for admin approval.',
+                status: 'PENDING',
+                email: user.email
             });
         } else {
             res.status(400).json({ message: 'Invalid user data' });
@@ -70,10 +64,23 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
+    // Enforce Rishihood Email (Exception for Seed Admin)
+    if ((!email || !email.endsWith('@rishihood.edu.in')) && email !== 'admin@saarang.com') {
+        return res.status(400).json({ message: 'Please use your official Rishihood University email address.' });
+    }
+
     try {
         const user = await User.findOne({ email });
 
         if (user && (await user.matchPassword(password))) {
+            // Check if account is approved
+            if (user.accountStatus === 'PENDING') {
+                return res.status(403).json({ 
+                    message: 'Your account is pending admin approval.',
+                    status: 'PENDING'
+                });
+            }
+
             const token = generateToken(user._id);
             res.cookie('token', token, {
                 httpOnly: true,
@@ -87,6 +94,7 @@ router.post('/login', async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                accountStatus: user.accountStatus,
                 profilePicture: user.profilePicture,
                 instrument: user.instrument,
                 phone: user.phone

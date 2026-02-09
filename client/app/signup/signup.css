@@ -1,0 +1,136 @@
+.signup-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background);
+  padding: var(--spacing-md);
+  transition: background-color 0.4s ease;
+}
+
+.signup-container {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.signup-header {
+  text-align: center;
+}
+
+.signup-header .logo {
+  font-family: var(--font-header);
+  font-size: 1.5rem;
+  letter-spacing: 4px;
+  color: var(--text-main);
+  text-decoration: none;
+  margin-bottom: var(--spacing-sm);
+  display: inline-block;
+}
+
+.signup-header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.signup-header p {
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.signup-error {
+  background: rgba(255, 82, 82, 0.1);
+  border: 1px solid var(--error);
+  color: var(--error);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.step-inner h3 {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.step-description {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-md);
+}
+
+.step-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background-color: var(--surface-hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.step-input:focus {
+  border-color: var(--accent);
+}
+
+.signup-review {
+  background-color: var(--surface-hover);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  margin-bottom: var(--spacing-md);
+}
+
+.review-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.review-item:last-child {
+  border-bottom: none;
+}
+
+.review-item .label {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.review-item .value {
+  font-weight: 600;
+}
+
+.submit-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.submitting-indicator {
+  text-align: center;
+  color: var(--text-main);
+  margin-top: var(--spacing-sm);
+  font-weight: 600;
+}
+
+.signup-footer {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.signup-footer a {
+  color: var(--text-main);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.signup-footer a:hover {
+  text-decoration: underline;
+}

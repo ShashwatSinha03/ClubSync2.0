@@ -1,138 +1,149 @@
 const express = require('express');
 const router = express.Router();
 const Event = require('../models/Event');
+const RSVP = require('../models/RSVP');
+const Attendance = require('../models/Attendance');
 const { protect, admin } = require('../middleware/auth');
 
 // @route   GET /api/events
-// @desc    Get all events
-// @access  Private (Members)
+// @desc    Get all events (Upcoming and Past)
+// @access  Private
 router.get('/', protect, async (req, res) => {
     try {
-        const events = await Event.find({})
-            .sort({ date: 1 })
-            .populate('createdBy', 'name')
-            .populate('rsvpList.user', 'name profilePicture')
-            .populate('attendance.user', 'name profilePicture');
+        const events = await Event.find().sort({ dateTime: 1 });
         res.json(events);
     } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
 // @route   POST /api/events
-// @desc    Create an event
-// @access  Private (Admin)
+// @desc    Create a new event
+// @access  Private/Admin
 router.post('/', protect, admin, async (req, res) => {
-    const { title, type, date, location, notes } = req.body;
+    const { title, type, dateTime, location, notes } = req.body;
+
+    if (!title || !type || !dateTime || !location) {
+        return res.status(400).json({ message: 'Please provide all required fields' });
+    }
 
     try {
-        const event = new Event({
+        const event = await Event.create({
             title,
             type,
-            date,
+            dateTime,
             location,
-            notes,
-            createdBy: req.user._id
+            notes
         });
 
-        const createdEvent = await event.save();
-        res.status(201).json(createdEvent);
+        res.status(201).json(event);
     } catch (error) {
-        res.status(400).json({ message: 'Invalid event data' });
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
-// @route   PUT /api/events/:id
-// @desc    Update an event
-// @access  Private (Admin)
-router.put('/:id', protect, admin, async (req, res) => {
-    const { title, type, date, location, notes } = req.body;
-
+// @route   GET /api/events/:id
+// @desc    Get single event with RSVP status and Attendance
+// @access  Private
+router.get('/:id', protect, async (req, res) => {
     try {
         const event = await Event.findById(req.params.id);
-
-        if (event) {
-            event.title = title || event.title;
-            event.type = type || event.type;
-            event.date = date || event.date;
-            event.location = location || event.location;
-            event.notes = notes || event.notes;
-
-            const updatedEvent = await event.save();
-            res.json(updatedEvent);
-        } else {
-            res.status(404).json({ message: 'Event not found' });
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
         }
-    } catch (error) {
-        res.status(404).json({ message: 'Event not found' });
-    }
-});
 
-// @route   DELETE /api/events/:id
-// @desc    Delete an event
-// @access  Private (Admin)
-router.delete('/:id', protect, admin, async (req, res) => {
-    try {
-        const event = await Event.findById(req.params.id);
-
-        if (event) {
-            await event.deleteOne();
-            res.json({ message: 'Event removed' });
+        const rsvp = await RSVP.findOne({ eventId: event._id, userId: req.user._id });
+        
+        let attendance = null;
+        if (req.user.role === 'ADMIN') {
+            // Fetch all approved members
+            const User = require('../models/User');
+            const members = await User.find({ accountStatus: 'APPROVED', role: 'MEMBER' }).select('name instrument');
+            
+            // Fetch existing attendance records
+            const records = await Attendance.find({ eventId: event._id });
+            
+            // Merge members with their records
+            attendance = members.map(member => {
+                const record = records.find(r => r.userId.toString() === member._id.toString());
+                return {
+                    userId: member,
+                    present: record ? record.present : false,
+                    hasRecord: !!record
+                };
+            });
         } else {
-            res.status(404).json({ message: 'Event not found' });
+            attendance = await Attendance.findOne({ eventId: event._id, userId: req.user._id });
         }
+
+        res.json({
+            event,
+            rsvp: rsvp ? rsvp.status : null,
+            attendance
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
 // @route   POST /api/events/:id/rsvp
-// @desc    RSVP for an event
-// @access  Private (Members)
+// @desc    RSVP to an event
+// @access  Private
 router.post('/:id/rsvp', protect, async (req, res) => {
-    const { status } = req.body; // GOING, MAYBE, NOT_GOING
+    const { status } = req.body;
+    if (!status || !['GOING', 'NOT_GOING'].includes(status)) {
+        return res.status(400).json({ message: 'Invalid RSVP status' });
+    }
 
     try {
         const event = await Event.findById(req.params.id);
-        if (!event) return res.status(404).json({ message: 'Event not found' });
-
-        const rsvpIndex = event.rsvpList.findIndex(r => r.user.toString() === req.user._id.toString());
-
-        if (rsvpIndex !== -1) {
-            event.rsvpList[rsvpIndex].status = status;
-        } else {
-            event.rsvpList.push({ user: req.user._id, status });
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
         }
 
-        await event.save();
-        res.json({ message: 'RSVP updated successfully', rsvpList: event.rsvpList });
+        const rsvp = await RSVP.findOneAndUpdate(
+            { eventId: event._id, userId: req.user._id },
+            { status },
+            { upsert: true, new: true }
+        );
+
+        res.json(rsvp);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
 // @route   POST /api/events/:id/attendance
-// @desc    Mark attendance for an event (Admin)
-// @access  Private (Admin)
+// @desc    Mark attendance for a user (Admin only)
+// @access  Private/Admin
 router.post('/:id/attendance', protect, admin, async (req, res) => {
-    const { userId, status } = req.body; //userId and status: PRESENT, ABSENT, LATE
-
+    const { userId, present } = req.body;
+    
     try {
         const event = await Event.findById(req.params.id);
-        if (!event) return res.status(404).json({ message: 'Event not found' });
-
-        const attendanceIndex = event.attendance.findIndex(a => a.user.toString() === userId.toString());
-
-        if (attendanceIndex !== -1) {
-            event.attendance[attendanceIndex].status = status;
-        } else {
-            event.attendance.push({ user: userId, status });
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
         }
 
-        await event.save();
-        res.json({ message: 'Attendance updated successfully', attendance: event.attendance });
+        // Attendance UI appears only after event time
+        if (new Date() < new Date(event.dateTime)) {
+            return res.status(400).json({ message: 'Cannot mark attendance before event starts' });
+        }
+
+        const attendance = await Attendance.findOneAndUpdate(
+            { eventId: event._id, userId },
+            { present },
+            { upsert: true, new: true }
+        );
+
+        res.json(attendance);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 

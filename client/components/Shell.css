@@ -1,0 +1,71 @@
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background);
+}
+
+.shell-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 var(--spacing-sm);
+}
+
+.shell-header {
+  padding: var(--spacing-md) 0;
+  position: sticky;
+  top: 0;
+  background-color: var(--background);
+  z-index: 100;
+}
+
+.shell-header .shell-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.shell-branding {
+  font-family: var(--font-header);
+  font-size: 1.25rem;
+  letter-spacing: 4px;
+  color: var(--text-main);
+  font-weight: 400;
+}
+
+.shell-main {
+  flex: 1;
+  padding: var(--spacing-md) 0 var(--spacing-xl) 0;
+}
+
+.shell-mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(41, 41, 41, 0.8);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border);
+  z-index: 1000;
+  padding: var(--spacing-sm) 0;
+}
+
+@media (max-width: 768px) {
+  .shell-header .shell-container {
+    justify-content: center;
+  }
+  
+  .shell-header .nav-desktop {
+    display: none;
+  }
+
+  .shell-mobile-nav {
+    display: block;
+  }
+  
+  .shell-main {
+    padding-bottom: 80px; /* Space for bottom nav */
+  }
+}

@@ -1,0 +1,123 @@
+.you-container {
+    padding-bottom: 4rem;
+    animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.identity-section {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #222;
+}
+
+.identity-name {
+    font-size: 2rem;
+    font-weight: 300;
+    margin: 0 0 0.5rem 0;
+    color: #eee;
+    letter-spacing: -0.5px;
+}
+
+.identity-meta {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.identity-meta span {
+    display: inline-block;
+    margin-right: 1rem;
+}
+
+.memory-section {
+    margin-bottom: 3rem;
+}
+
+.memory-text {
+    font-size: 1.1rem;
+    color: #aaa;
+    line-height: 1.5;
+    font-weight: 300;
+    max-width: 500px;
+}
+
+.memory-text strong {
+    color: #fff;
+    font-weight: 400;
+}
+
+.timeline-section .section-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #444;
+    margin-bottom: 1.5rem;
+    display: block;
+}
+
+.timeline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 1.5rem;
+    border-left: 1px solid #222;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -3px;
+    top: 0;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #333;
+}
+
+.timeline-item.status-ATTENDED {
+    border-left-color: #444;
+}
+
+.timeline-item.status-ATTENDED::before {
+    background: #eee;
+}
+
+.timeline-item.status-MISSED {
+    border-left-color: #331111;
+}
+
+.timeline-item.status-MISSED::before {
+    background: #552222;
+}
+
+.status-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.status-ATTENDED .status-label { color: #888; }
+.status-MISSED .status-label { color: #884444; }
+.status-UPCOMING .status-label { color: #666; }
+
+.timeline-item .event-card {
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+}
+
+.timeline-item .event-title {
+    font-size: 1.1rem;
+}
