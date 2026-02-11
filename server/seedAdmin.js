@@ -11,7 +11,7 @@ connectDB();
 const createAdminUser = async () => {
     try {
         // Check if admin already exists
-        const adminExists = await User.findOne({ email: 'admin@saarang.com' });
+        const adminExists = await User.findOne({ email: 'sample@rishihood.edu.in' });
 
         if (adminExists) {
             console.log('Admin user already exists');
@@ -20,8 +20,8 @@ const createAdminUser = async () => {
 
         // Create admin user
         const admin = await User.create({
-            name: 'Admin',
-            email: 'admin@saarang.com',
+            name: 'Sample Admin',
+            email: 'sample@rishihood.edu.in',
             password: 'admin123', // CHANGE THIS AFTER FIRST LOGIN
             role: 'ADMIN',
             accountStatus: 'APPROVED',
