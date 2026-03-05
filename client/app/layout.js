@@ -17,7 +17,7 @@ const spinnaker = Spinnaker({
 });
 
 export const metadata = {
-  title: "Saarang Music Club",
+  title: "ClubSync Saarang",
   description: "Official portal for Saarang Music Club, Rishihood University",
 };
 

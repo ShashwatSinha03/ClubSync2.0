@@ -147,3 +147,68 @@
     gap: var(--spacing-lg);
   }
 }
+
+.attendance-list-snapshot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.attendance-row-snapshot {
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-container input {
+  display: none;
+}
+
+.checkmark {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: inline-block;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.checkbox-container:hover .checkmark {
+  border-color: var(--text-main);
+}
+
+.checkbox-container input:checked + .checkmark {
+  background-color: var(--text-main);
+  border-color: var(--text-main);
+}
+
+.checkbox-container input:checked + .checkmark::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--background);
+  font-size: 12px;
+}
+
+.checkbox-container .member-name {
+  font-size: 1.1rem;
+  color: var(--text-main);
+  font-family: var(--font-spinnaker);
+}
+
+.attendance-list-snapshot .no-activity {
+  font-style: italic;
+  color: var(--text-muted);
+  opacity: 0.6;
+}

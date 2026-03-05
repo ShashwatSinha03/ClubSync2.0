@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const Event = require('../models/Event');
 const RSVP = require('../models/RSVP');
-const Attendance = require('../models/Attendance');
 const { protect } = require('../middleware/auth');
 
 // @route   GET /api/users/activity
@@ -13,27 +12,29 @@ router.get('/activity', protect, async (req, res) => {
         const userId = req.user._id;
         const now = new Date();
 
-        // Fetch all events
-        const events = await Event.find().sort({ dateTime: 1 });
-
-        // Fetch user's RSVPs and Attendance
+        // Fetch user's RSVPs and all events for attendance check
         const rsvps = await RSVP.find({ userId });
-        const attendanceRecords = await Attendance.find({ userId });
+        
+        // Fetch events
+        const allEvents = await Event.find().sort({ dateTime: 1 });
 
-        const history = events.map(event => {
+        const history = allEvents.map(event => {
             const eventDate = new Date(event.dateTime);
             const rsvp = rsvps.find(r => r.eventId.toString() === event._id.toString());
-            const attendance = attendanceRecords.find(a => a.eventId.toString() === event._id.toString());
+            
+            // Find the user's status in the event's attendance array
+            const attendRecord = (event.attendance || []).find(a => a.userId.toString() === userId.toString());
+            const userAttendanceStatus = attendRecord ? attendRecord.status : 'NONE';
 
-            let status = 'NONE'; // Default
+            let status = 'NONE';
 
-            if (attendance && attendance.present) {
+            if (userAttendanceStatus === 'PRESENT') {
                 status = 'ATTENDED';
             } else if (eventDate < now) {
-                if (rsvp && rsvp.status === 'GOING' && (!attendance || !attendance.present)) {
+                if (rsvp && rsvp.status === 'GOING' && userAttendanceStatus !== 'PRESENT') {
                     status = 'MISSED';
-                } else {
-                    status = 'PAST'; // Just an older event they didn't interact with
+                } else if (userAttendanceStatus !== 'NONE') {
+                    status = 'PAST';
                 }
             } else {
                 if (rsvp && rsvp.status === 'GOING') {
@@ -50,34 +51,25 @@ router.get('/activity', protect, async (req, res) => {
             };
         });
 
-        // Calculate summary
-        // "Attended X of Y events" (Count past events where type != 'Audition' maybe? Or just all?)
-        // Let's count all past events as denominator for simple participation rate?
-        // Actually, user requested: "Attended 7 out of the last 10 sessions"
-        // Let's just return raw numbers and let frontend format the text?
-        // Or return the specific text as requested by "calm summary".
-
-        const attendedCount = history.filter(h => h.status === 'ATTENDED').length;
-        const missedCount = history.filter(h => h.status === 'MISSED').length;
-        const pastEventsCount = events.filter(e => new Date(e.dateTime) < now).length;
-        
-        // Filter history to only relevant items for the user (remove 'PAST' where they had no interaction?)
-        // "Events attended", "Events RSVPd but missed", "Upcoming events committed to"
-        // So we filter out 'PAST' and 'NONE' for the list, but keep numbers for stats.
-        
+        // Filter for relevant history
         const relevantHistory = history.filter(h => ['ATTENDED', 'MISSED', 'UPCOMING'].includes(h.status));
 
-        // Sort history: Upcoming first (asc), then Past (desc)
-        // Actually, "Ordered by time" rule. 
-        // Maybe separate lists? Or just one list.
-        // Let's return one list sorted descending? Or Split.
-        // Frontend "The People" spec: "Ordered by time".
+        // Calculate Stats
+        // totalPast: Count of events where this user was expected to be (i.e., in the attendance snapshot)
+        const userEventsMatching = allEvents.filter(e => 
+            (e.attendance || []).some(a => a.userId.toString() === userId.toString()) && 
+            new Date(e.dateTime) < now
+        );
         
+        const attendedCount = history.filter(h => h.status === 'ATTENDED').length;
+        const missedCount = history.filter(h => h.status === 'MISSED').length;
+        const totalPast = userEventsMatching.length;
+
         res.json({
             memberSince: req.user.createdAt,
             stats: {
                 attended: attendedCount,
-                totalPast: pastEventsCount,
+                totalPast: totalPast,
                 missed: missedCount
             },
             history: relevantHistory.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime))

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '../../../context/AuthContext';
 import Shell from '../../../components/Shell';
 import ActionButton from '../../../components/ActionButton';
 import StatusPill from '../../../components/StatusPill';
@@ -10,15 +11,11 @@ import './event-detail.css';
 const EventDetailPage = () => {
   const { id } = useParams();
   const router = useRouter();
+  const { user } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Get user from localStorage
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) setUser(JSON.parse(storedUser));
-
     const fetchDetail = async () => {
       try {
         const response = await fetch(`http://localhost:5001/api/events/${id}`, {
@@ -38,26 +35,12 @@ const EventDetailPage = () => {
     fetchDetail();
   }, [id]);
 
-  const handleRSVP = async (status) => {
-    try {
-      const response = await fetch(`http://localhost:5001/api/events/${id}/rsvp`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({ status })
-      });
+  // Old RSVP logic removed as per Phase E9.
 
-      if (response.ok) {
-        setData(prev => ({ ...prev, rsvp: status }));
-      }
-    } catch (error) {
-      console.error('Error submitting RSVP:', error);
-    }
-  };
-
-  const handleAttendance = async (userId, present) => {
+  const handleAttendance = async (userId, currentStatus) => {
+    // Behavior: Checking -> PRESENT, Unchecking -> ABSENT
+    const newStatus = currentStatus === 'PRESENT' ? 'ABSENT' : 'PRESENT';
+    
     try {
       const response = await fetch(`http://localhost:5001/api/events/${id}/attendance`, {
         method: 'POST',
@@ -65,24 +48,20 @@ const EventDetailPage = () => {
           'Content-Type': 'application/json'
         },
         credentials: 'include',
-        body: JSON.stringify({ userId, present })
+        body: JSON.stringify({ userId, status: newStatus })
       });
 
       if (response.ok) {
-        const updatedAttendance = await response.json();
         setData(prev => {
           const newAttendanceList = [...prev.attendance];
-          const index = newAttendanceList.findIndex(a => a.userId._id === userId);
+          const index = newAttendanceList.findIndex(a => 
+            (a.userId._id || a.userId) === userId
+          );
           if (index !== -1) {
-            newAttendanceList[index] = { ...newAttendanceList[index], present };
-          } else {
-             // This case shouldn't normally happen if we fetch full list for admin
-             // But for safety, we could refetch or find the member in a member list
+            newAttendanceList[index] = { ...newAttendanceList[index], status: newStatus };
           }
           return { ...prev, attendance: newAttendanceList };
         });
-        
-        // Final, responsible feel: maybe brief silent confirmation
       }
     } catch (error) {
       console.error('Error submitting attendance:', error);
@@ -149,53 +128,32 @@ const EventDetailPage = () => {
           </div>
         </section>
 
-        {!isPast && (
-          <div className="rsvp-interaction-block">
-            <p className="ambient-text">Will you be part of this moment?</p>
-            <div className="rsvp-options">
-              <ActionButton 
-                label="Going" 
-                variant={rsvp === 'GOING' ? 'active' : 'primary'} 
-                onClick={() => handleRSVP('GOING')} 
-              />
-              <ActionButton 
-                label="Not Going" 
-                variant={rsvp === 'NOT_GOING' ? 'active' : 'secondary'} 
-                onClick={() => handleRSVP('NOT_GOING')} 
-              />
-            </div>
-          </div>
-        )}
+        {/* Old RSVP interaction block removed as it is now inline on EventCards */}
 
-        {isAdmin && isPast && (
+        {isAdmin && (
           <section className="admin-attendance-section">
             <div className="section-label">Attendance Marking</div>
-            <div className="attendance-list">
-              {/* Note: In a real app, we'd need a list of all members. 
-                  For now, we use what's returned in attendance array or handle it simply */}
+            <div className="attendance-list-snapshot">
               {attendance && attendance.length > 0 ? (
-                attendance.map((record) => (
-                  <div key={record.userId._id} className="attendance-row">
-                    <div className="member-info">
-                      <span className="member-name">{record.userId.name}</span>
-                      <span className="member-instrument">{record.userId.instrument}</span>
+                attendance.map((record) => {
+                  const memberId = record.userId._id || record.userId;
+                  const memberName = record.userId.name || "Member";
+                  return (
+                    <div key={memberId} className="attendance-row-snapshot">
+                      <label className="checkbox-container">
+                        <input 
+                          type="checkbox" 
+                          checked={record.status === 'PRESENT'}
+                          onChange={() => handleAttendance(memberId, record.status)}
+                        />
+                        <span className="checkmark"></span>
+                        <span className="member-name">{memberName}</span>
+                      </label>
                     </div>
-                    <div className="attendance-actions">
-                       <ActionButton 
-                        label="Present" 
-                        variant={record.present ? 'active' : 'secondary'} 
-                        onClick={() => handleAttendance(record.userId._id, true)}
-                      />
-                      <ActionButton 
-                        label="Absent" 
-                        variant={!record.present ? 'active' : 'secondary'} 
-                        onClick={() => handleAttendance(record.userId._id, false)}
-                      />
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
-                <p className="no-events">No records to mark yet. (Attendance logic needs member list integration)</p>
+                <p className="no-activity">No members in snapshot for this event.</p>
               )}
             </div>
           </section>
@@ -204,12 +162,12 @@ const EventDetailPage = () => {
         {isPast && !isAdmin && (
            <div className="club-memory">
              <p>This moment has passed.</p>
-             {attendance?.present && <p className="success-text">You were present. Memory stored.</p>}
+             {attendance === 'PRESENT' && <p className="success-text">You were present. Memory stored.</p>}
            </div>
         )}
       </div>
     </Shell>
-  );
+    );
 };
 
 export default EventDetailPage;

@@ -43,7 +43,7 @@
 .nav-mobile .nav-link {
   display: flex;
   flex-direction: column;
-  items-align: center;
+  align-items: center;
   font-size: 0.8rem;
   padding: 0.25rem 0;
 }

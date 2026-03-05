@@ -14,7 +14,7 @@ const RSVPSchema = new mongoose.Schema({
   status: {
     type: String,
     required: true,
-    enum: ['GOING', 'NOT_GOING']
+    enum: ['ATTENDING', 'NOT_ATTENDING']
   }
 }, {
   timestamps: true

@@ -1,5 +1,7 @@
 .you-container {
-    padding-bottom: 4rem;
+    padding: var(--spacing-lg) 0 var(--spacing-xxl) 0;
+    max-width: 600px;
+    margin: 0 auto;
     animation: fadeIn 0.8s ease-out;
 }
 
@@ -9,67 +11,101 @@
 }
 
 .identity-section {
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid #222;
+    margin-bottom: var(--spacing-xl);
+    text-align: center;
+}
+
+.ambient-text {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+    opacity: 0.6;
 }
 
 .identity-name {
-    font-size: 2rem;
+    font-size: 3rem;
     font-weight: 300;
-    margin: 0 0 0.5rem 0;
-    color: #eee;
-    letter-spacing: -0.5px;
+    margin: 0 0 var(--spacing-md) 0;
+    color: var(--text-main);
+    letter-spacing: -2px;
+    line-height: 1;
 }
 
 .identity-meta {
     font-size: 0.9rem;
-    color: #666;
+    color: var(--text-muted);
     margin: 0;
     line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    font-family: var(--font-body);
 }
 
-.identity-meta span {
-    display: inline-block;
-    margin-right: 1rem;
+.meta-dot {
+    opacity: 0.3;
 }
 
 .memory-section {
-    margin-bottom: 3rem;
+    margin-top: var(--spacing-xxl);
+    margin-bottom: var(--spacing-xxl);
+    text-align: center;
+    padding: var(--spacing-xl) 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
 }
 
 .memory-text {
-    font-size: 1.1rem;
-    color: #aaa;
-    line-height: 1.5;
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    line-height: 1.4;
     font-weight: 300;
     max-width: 500px;
+    margin: 0 auto;
 }
 
 .memory-text strong {
-    color: #fff;
-    font-weight: 400;
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+.missed-notice {
+    display: block;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: var(--error);
+    opacity: 0.8;
+}
+
+.timeline-section {
+    margin-top: var(--spacing-xl);
 }
 
 .timeline-section .section-label {
     font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    color: #444;
-    margin-bottom: 1.5rem;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-xl);
     display: block;
+    opacity: 0.5;
+    text-align: center;
 }
 
 .timeline-list {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: var(--spacing-xl);
 }
 
 .timeline-item {
     position: relative;
-    padding-left: 1.5rem;
-    border-left: 1px solid #222;
+    padding-left: var(--spacing-lg);
+    border-left: 1px solid var(--border);
 }
 
 .timeline-item::before {
@@ -80,36 +116,44 @@
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background: #333;
+    background: var(--border);
 }
 
 .timeline-item.status-ATTENDED {
-    border-left-color: #444;
+    border-left-color: var(--text-main);
 }
 
 .timeline-item.status-ATTENDED::before {
-    background: #eee;
+    background: var(--text-main);
 }
 
 .timeline-item.status-MISSED {
-    border-left-color: #331111;
+    border-left-color: var(--error);
 }
 
 .timeline-item.status-MISSED::before {
-    background: #552222;
+    background: var(--error);
 }
 
 .status-label {
     font-size: 0.7rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 0.5rem;
+    letter-spacing: 2px;
+    margin-bottom: 0.75rem;
     display: block;
+    font-weight: 600;
 }
 
-.status-ATTENDED .status-label { color: #888; }
-.status-MISSED .status-label { color: #884444; }
-.status-UPCOMING .status-label { color: #666; }
+.status-ATTENDED .status-label { color: var(--text-muted); }
+.status-MISSED .status-label { color: var(--error); }
+.status-UPCOMING .status-label { color: var(--text-muted); }
+
+.no-activity {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    opacity: 0.6;
+}
 
 .timeline-item .event-card {
     border: none;
@@ -119,5 +163,6 @@
 }
 
 .timeline-item .event-title {
-    font-size: 1.1rem;
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
 }

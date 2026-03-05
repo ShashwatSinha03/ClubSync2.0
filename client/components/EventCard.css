@@ -71,3 +71,98 @@
     gap: var(--spacing-md);
   }
 }
+
+/* Inline RSVP Styles */
+.event-rsvp-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--spacing-sm);
+  min-width: 250px;
+}
+
+.rsvp-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.rsvp-btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-primary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease; /* subtle fade */
+}
+
+.rsvp-btn:hover:not(:disabled) {
+  background: var(--surface);
+}
+
+.rsvp-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Active States */
+.rsvp-btn.active-attending {
+  background: var(--accent);
+  color: var(--background);
+  border-color: var(--accent);
+}
+
+.rsvp-btn.active-not-attending {
+  background: var(--text-muted);
+  color: var(--background);
+  border-color: var(--text-muted);
+}
+
+.rsvp-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.expand-admin-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.admin-rsvp-list {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  width: 100%;
+  text-align: left;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.admin-rsvp-list h4 {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.admin-rsvp-list ul {
+  list-style-type: none;
+  margin: 0 0 var(--spacing-sm) 0;
+  padding: 0;
+}
+
+.admin-rsvp-list li {
+  padding: 2px 0;
+}

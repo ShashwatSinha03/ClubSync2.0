@@ -23,7 +23,11 @@ const EventSchema = new mongoose.Schema({
   notes: {
     type: String,
     trim: true
-  }
+  },
+  attendance: [{
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    status: { type: String, enum: ['PENDING', 'PRESENT', 'ABSENT'], default: 'PENDING' }
+  }]
 }, {
   timestamps: true
 });

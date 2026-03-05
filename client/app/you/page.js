@@ -32,9 +32,9 @@ const ProfilePage = () => {
     if (loading) {
         return (
             <Shell>
-                <div className="home-container" style={{ display: 'flex', justifyContent: 'center', paddingTop: '4rem' }}>
-                    <div style={{ width: '20px', height: '20px', border: '2px solid #333', borderTopColor: '#eee', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-                    <style jsx>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                <div className="loading-screen">
+                    <div className="loader"></div>
+                    <p className="ambient-text">Recalling memories...</p>
                 </div>
             </Shell>
         );
@@ -49,28 +49,32 @@ const ProfilePage = () => {
 
     return (
         <Shell>
-            <div className="home-container you-container">
-                <section className="identity-section">
+            <div className="you-container">
+                <header className="identity-section">
+                    <p className="ambient-text">Profile • Your Identity</p>
                     <h1 className="identity-name">{user?.name}</h1>
-                    <p className="identity-meta">
+                    <div className="identity-meta">
                         <span>{user?.email}</span>
+                        <span className="meta-dot">•</span>
                         <span>{user?.role === 'ADMIN' ? 'Admin' : 'Member'}</span>
+                        <span className="meta-dot">•</span>
                         <span>Since {formatDate(memberSince || user?.createdAt)}</span>
-                    </p>
-                </section>
+                    </div>
+                </header>
 
                 <section className="memory-section">
                     <p className="memory-text">
-                        You have attended <strong>{stats?.attended || 0}</strong> out of <strong>{stats?.totalPast || 0}</strong> sessions since you joined.
-                        {stats?.missed > 0 && <span style={{ display: 'block', marginTop: '0.5rem', fontSize: '0.9rem', color: '#664444' }}>You missed {stats.missed} committed events.</span>}
+                        You've attended <strong>{stats?.attended || 0}</strong> out of <strong>{stats?.totalPast || 0}</strong> sessions.
                     </p>
                 </section>
 
                 <section className="timeline-section">
-                    <span className="section-label">Your Memory</span>
+                    <header className="section-header">
+                        <span className="section-label">Your Memory</span>
+                    </header>
                     
                     {history.length === 0 ? (
-                        <p style={{ color: '#555', fontStyle: 'italic', marginTop: '1rem' }}>No activity recorded yet.</p>
+                        <p className="no-activity">No activity recorded yet.</p>
                     ) : (
                         <div className="timeline-list">
                             {history.map(item => (
@@ -82,7 +86,7 @@ const ProfilePage = () => {
                                     </span>
                                     <EventCard 
                                         event={item} 
-                                        variant="timeline" // Using fallback style defined in CSS or default
+                                        variant="timeline"
                                     />
                                 </div>
                             ))}
