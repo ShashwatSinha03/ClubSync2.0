@@ -36,7 +36,7 @@ const sendApprovalEmail = async (userEmail, userName) => {
                     <p>
                         You are now part of the Saarang workspace. You can log in and view the club's rhythm.
                     </p>
-                    <a href="${process.env.CLIENT_URL || 'http://localhost:3000'}/login" style="display: inline-block; background: #292929; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin-top: 10px;">
+                    <a href="${process.env.CLIENT_URL}/login" style="display: inline-block; background: #292929; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin-top: 10px;">
                         Enter ClubSync
                     </a>
                     <hr style="border: none; border-top: 1px solid #eee; margin-top: 30px;">

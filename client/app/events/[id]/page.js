@@ -18,7 +18,7 @@ const EventDetailPage = () => {
   useEffect(() => {
     const fetchDetail = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/api/events/${id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/events/${id}`, {
           credentials: 'include'
         });
         if (response.ok) {
@@ -42,7 +42,7 @@ const EventDetailPage = () => {
     const newStatus = currentStatus === 'PRESENT' ? 'ABSENT' : 'PRESENT';
     
     try {
-      const response = await fetch(`http://localhost:5001/api/events/${id}/attendance`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/events/${id}/attendance`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

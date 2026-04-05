@@ -33,7 +33,7 @@ const EventCard = ({ event, variant = 'secondary' }) => {
     setAttendingCount(newCount);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/events/${event._id}/rsvp`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/events/${event._id}/rsvp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
