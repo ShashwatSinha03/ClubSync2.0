@@ -8,6 +8,7 @@
   --text-main: #FFFFFF;
   --text-muted: #BDBDBD;
   --border: rgba(255, 255, 255, 0.1);
+  --secondary: #8B5CF6;
   --error: #FF5252;
   --success: #66BB6A;
   
@@ -35,6 +36,7 @@
   --text-main: #292929;
   --text-muted: #666666;
   --border: rgba(0, 0, 0, 0.1);
+  --secondary: #6D28D9;
   
   /* Nav Colors Reverse */
   --nav-base: #EEE5E9;
@@ -101,7 +103,7 @@ label, .label, .section-label, .nav-link, .tab-btn {
 
 .btn--primary {
   background-color: var(--primary);
-  color: white;
+  color: var(--background);
 }
 
 .btn--primary:hover {
